@@ -6,7 +6,6 @@
  */
 
 module.exports = {
-
   attributes: {
     amount: {
       type: 'number',
@@ -18,7 +17,7 @@ module.exports = {
     },
     categories: {
       collection: 'category',
-      via: 'transactions'
+      via: 'transaction'
     },
     type: {
       type: 'string',
@@ -31,7 +30,7 @@ module.exports = {
     },
     evidence: {
       collection: 'image',
-      via: 'transactions',
+      via: 'transaction',
       required: false,
     },
     user: {

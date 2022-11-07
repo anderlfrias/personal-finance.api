@@ -41,6 +41,10 @@ module.exports = {
       type: 'boolean',
       defaultsTo: false,
     },
+    wallets: {
+      collection: 'wallet',
+      via: 'user'
+    },
   },
 
 };

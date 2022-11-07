@@ -23,10 +23,6 @@ module.exports = {
       type: 'string',
       required: false,
     },
-    transactions: {
-      collection: 'transaction',
-      via: 'wallet'
-    },
     user: {
       model: 'user',
       required: true,

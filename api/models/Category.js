@@ -11,17 +11,12 @@ module.exports = {
     name: {
       type: 'string',
       required: true,
+    },
+    normalizedName: {
+      type: 'string',
+      required: true,
       unique: true,
     },
-    description: {
-      type: 'string',
-      required: false,
-    },
-    transactions: {
-      collection: 'transaction',
-      via: 'category'
-    },
-
   },
 
 };
