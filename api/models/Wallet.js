@@ -16,7 +16,6 @@ module.exports = {
     },
     amount: {
       type: 'number',
-      defaultsTo: 0.0,
       required: true,
     },
     description: {

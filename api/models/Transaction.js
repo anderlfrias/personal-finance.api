@@ -15,10 +15,6 @@ module.exports = {
       model: 'wallet',
       required: true,
     },
-    categories: {
-      collection: 'category',
-      via: 'transaction'
-    },
     type: {
       type: 'string',
       isIn: ['income', 'expense'],
@@ -40,7 +36,11 @@ module.exports = {
     description: {
       type: 'string',
       required: false,
-    }
+    },
+    category: {
+      collection: 'category',
+      via: 'transaction',
+    },
   },
 
 };

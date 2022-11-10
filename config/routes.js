@@ -19,7 +19,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': { view: 'pages/homepage' },
+  // '/': { view: 'pages/homepage' },
 
 
   /***************************************************************************
@@ -33,5 +33,13 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-
+  /*=============================================
+  =         Routes of UserController            =
+  =============================================*/
+  'GET /api/v1/user': 'UserController.get',
+  'GET /api/v1/user/:id': 'UserController.getById',
+  'POST /api/v1/user': 'UserController.create',
+  'PUT /api/v1/user/:id': 'UserController.update',
+  'DELETE /api/v1/user/:id': 'UserController.delete',
+  /*=====  End of Routes of UserController  ======*/
 };
