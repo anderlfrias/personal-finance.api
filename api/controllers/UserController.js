@@ -5,6 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 const bcrypt = require('bcrypt');
+const sign = require('jwt-encode');
 module.exports = {
   /*=============================================
   =            Create User Function            =
@@ -247,6 +248,69 @@ module.exports = {
     }
   },
   /*=====  End of Get All Users Function  ======*/
+
+  /*=============================================
+  =            Login Users Function             =
+  =============================================*/
+  login: async function (req, res) {
+    try {
+      const { username, email, password } = req.body;
+
+      const user = await User.findOne({
+        where: {
+          or: [
+            { username },
+            { email },
+          ],
+        },
+      });
+
+      if (!user || !password) {
+        return res.badRequest({
+          message: 'Missing fields',
+          code: 'E_MISSING_FIELDS',
+        });
+      }
+
+      const isPasswordValid = bcrypt.compareSync(password, user.password);
+
+      if (!isPasswordValid) {
+        return res.badRequest({
+          message: 'Failed to authenticate',
+          code: 'E_FAILED_TO_AUTHENTICATE',
+        });
+      }
+
+      const secret = sails.config.session.secret;
+
+      //Data to be encrypted
+      const data = {
+        id: user.id,
+        name: user.name,
+        firstSurname: user.firstSurname,
+        secondSurname: user.secondSurname,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        isActive: user.isActive,
+      };
+
+      const jwt = sign(data, secret);
+
+      return res.ok({
+        message: 'User authenticated',
+        code: 'E_USER_AUTHENTICATED',
+        token: jwt,
+      });
+
+    } catch (err) {
+      return res.serverError({
+        message: 'Server error',
+        code: 'E_SERVER_ERROR',
+        err,
+      });
+    }
+  },
 
 };
 
