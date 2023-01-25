@@ -1,4 +1,4 @@
-# new-wallet-adm-api
+# Wallet Admin API
 
 a [Sails v1](https://sailsjs.com) application
 
