@@ -39,6 +39,7 @@ module.exports.routes = {
   'GET /api/v1/user': 'UserController.get',
   'GET /api/v1/user/:id': 'UserController.getById',
   'POST /api/v1/user': 'UserController.create',
+  'POST /api/v1/user/login': 'UserController.login',
   'PUT /api/v1/user/:id': 'UserController.update',
   'DELETE /api/v1/user/:id': 'UserController.delete',
   /*=====  End of Routes of UserController  ======*/

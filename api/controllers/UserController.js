@@ -8,9 +8,6 @@
 const bcrypt = require('bcrypt');
 const sign = require('jwt-encode');
 module.exports = {
-  /*=============================================
-  =            Create User Function            =
-  =============================================*/
   create: async function (req, res) {
     try {
       const saltRounds = 10;
@@ -23,9 +20,8 @@ module.exports = {
         password: unencryptedPassword,
       } = req.body;
 
-      if (!name || !firstSurname || !email || !username || !password) {
+      if (!name || !firstSurname || !email || !username || !unencryptedPassword) {
         return res.badRequest({
-          success: false,
           message: 'Missing fields',
         });
       }
@@ -43,29 +39,21 @@ module.exports = {
 
       if (user) {
         return res.ok({
-          success: true,
-          message: 'User created',
           user,
         });
       }
 
       return res.badRequest({
-        success: false,
         message: 'Error creating user',
       });
     } catch (err) {
       return res.serverError({
-        success: false,
         message: 'Server error',
         err,
       });
     }
   },
-  /*=====  End of Create User Function  ======*/
 
-  /*=============================================
-  =            Update User Function            =
-  =============================================*/
   update: async function (req, res) {
     try {
       const { id } = req.params;
@@ -73,14 +61,12 @@ module.exports = {
 
       if (!id) {
         return res.badRequest({
-          success: false,
           message: 'Id not provided',
         });
       }
 
       if (!name || !firstSurname || !email || !username || !password || !role) {
         return res.badRequest({
-          success: false,
           message: 'Missing fields',
         });
       }
@@ -95,29 +81,22 @@ module.exports = {
 
       if (user) {
         return res.ok({
-          success: true,
           message: 'User updated',
           user,
         });
       }
 
       return res.badRequest({
-        success: false,
         message: 'Error updating user',
       });
     } catch (err) {
       return res.serverError({
-        success: false,
         message: 'Server error',
         err,
       });
     }
   },
-  /*=====  End of Update User Function  ======*/
 
-  /*=============================================
-  =            Delete User Function            =
-  =============================================*/
   delete: async function (req, res) {
     try {
       const { id } = req.params;
@@ -147,11 +126,7 @@ module.exports = {
       });
     }
   },
-  /*=====  End of Delete User Function  ======*/
 
-  /*=============================================
-  =          Get User By Id Function            =
-  =============================================*/
   getById: async function (req, res) {
     try {
       const { id } = req.params;
@@ -187,23 +162,20 @@ module.exports = {
       });
     }
   },
-  /*=====  End of Get User Function  ======*/
 
-  /*=============================================
-  =            Get All Users Function            =
-  =============================================*/
   get: async function (req, res) {
     try {
-      const { b } = req.allParams();
+      const { q = '' } = req.allParams();
 
+      console.log(q);
       const users = await User.find({
         where: {
           or: [
-            { name: { contains: b } },
-            { firstSurname: { contains: b } },
-            { secondSurname: { contains: b } },
-            { email: { contains: b } },
-            { username: { contains: b } },
+            { name: { contains: q } },
+            { firstSurname: { contains: q } },
+            { secondSurname: { contains: q } },
+            { email: { contains: q } },
+            { username: { contains: q } },
           ],
         },
       }).meta({ makeLikeModifierCaseInsensitive: true });
@@ -233,24 +205,30 @@ module.exports = {
       });
     }
   },
-  /*=====  End of Get All Users Function  ======*/
 
-  /*=============================================
-  =            Login Users Function             =
-  =============================================*/
   login: async function (req, res) {
     try {
       const { username, email, password } = req.body;
 
-      const user = await User.findOne({
-        where: {
-          or: [
-            { username },
-            { email },
-          ],
-        },
-      });
+      let user = null;
+      if (username) {
+        user = await User.findOne({ username });
+      }
 
+      if (email) {
+        user = await User.findOne({ email });
+      }
+
+      // const user = await User.findOne({
+      //   where: {
+      //     or: [
+      //       { username },
+      //       { email },
+      //     ],
+      //   },
+      // });
+
+      console.log(user);
       if (!user || !password) {
         return res.badRequest({
           message: 'Missing fields',
