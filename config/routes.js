@@ -44,5 +44,13 @@ module.exports.routes = {
   'DELETE /api/v1/user/:id': 'UserController.delete',
   /*=====  End of Routes of UserController  ======*/
 
-
+  /*=============================================
+  =         Routes of WalletController         =
+  =============================================*/
+  'GET /api/v1/wallet': 'WalletController.get',
+  'GET /api/v1/wallet/:id': 'WalletController.getById',
+  'POST /api/v1/wallet': 'WalletController.create',
+  'PUT /api/v1/wallet/:id': 'WalletController.update',
+  'DELETE /api/v1/wallet/:id': 'WalletController.delete',
+  /*=====  End of Routes of WalletController  ======*/
 };
