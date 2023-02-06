@@ -53,4 +53,14 @@ module.exports.routes = {
   'PUT /api/v1/wallet/:id': 'WalletController.update',
   'DELETE /api/v1/wallet/:id': 'WalletController.delete',
   /*=====  End of Routes of WalletController  ======*/
+
+  /*=============================================
+  =         Routes of CategoryController       =
+  =============================================*/
+  'GET /api/v1/category': 'CategoryController.get',
+  'GET /api/v1/category/:id': 'CategoryController.getById',
+  'POST /api/v1/category': 'CategoryController.create',
+  'PUT /api/v1/category/:id': 'CategoryController.update',
+  'DELETE /api/v1/category/:id': 'CategoryController.delete',
+  /*=====  End of Routes of CategoryController  ======*/
 };
