@@ -49,7 +49,124 @@ module.exports = {
         wallet,
       }).fetch();
 
+      if (!transaction) {
+        return res.badRequest({ message: 'Failed to create transaction' });
+      }
+
       return res.ok({transaction});
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
+      });
+    }
+  },
+  update: async function (req, res) {
+    try {
+      const { id } = req.params;
+      const { description, evidence } = req.allParams();
+
+      if (!id) {
+        return res.badRequest({ message: 'Id not provided' });
+      }
+
+      const transactionUpdated = await Transaction.updateOne({ id }).set({
+        description,
+        evidence,
+      });
+
+      if (!transactionUpdated) {
+        return res.badRequest({ message: 'Failed to update transaction' });
+      }
+
+      return res.ok({ transactionUpdated });
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
+      });
+    }
+  },
+  delete: async function (req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.badRequest({ message: 'Id not provided' });
+      }
+
+      const transactionToDelete = await Transaction.findOne({ id });
+
+      if (!transactionToDelete) {
+        return res.badRequest({ message: 'Transaction not found' });
+      }
+
+      // Upadate wallet balance
+      const walletToUpdate = await Wallet.findOne({ wallet: transactionToDelete.wallet });
+
+      if (!walletToUpdate) {
+        return res.badRequest({ message: 'Wallet not found' });
+      }
+
+      if (transactionToDelete.type === 'expense') {
+        const walletUpdated = await Wallet.updateOne({ id: walletToUpdate.id }).set({ balance: walletToUpdate.balance + transactionToDelete.amount });
+        if (!walletUpdated) {
+          return res.badRequest({ message: 'Failed to update wallet balance' });
+        }
+      }
+
+      if (transactionToDelete.type === 'income') {
+        const walletUpdated = await Wallet.updateOne({ id: walletToUpdate.id }).set({ balance: walletToUpdate.balance - transactionToDelete.amount });
+        if (!walletUpdated) {
+          return res.badRequest({ message: 'Failed to update wallet balance' });
+        }
+      }
+
+      const transactionDeleted = await Transaction.destroyOne({ id });
+
+      if (!transactionDeleted) {
+        return res.badRequest({ message: 'Failed to delete transaction' });
+      }
+
+      return res.ok({ transaction: transactionDeleted });
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
+      });
+    }
+  },
+  get: async function (req, res) {
+    try {
+      const transactions = await Transaction.find();
+
+      if (!transactions) {
+        return res.badRequest({ message: 'Failed to get transactions' });
+      }
+
+      return res.ok( transactions );
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
+      });
+    }
+  },
+  getById: async function (req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.badRequest({ message: 'Id not provided' });
+      }
+
+      const transaction = await Transaction.findOne({ id });
+
+      if (!transaction) {
+        return res.badRequest({ message: 'Transaction not found' });
+      }
+
+      return res.ok( transaction );
     } catch (error) {
       return res.serverError({
         message: 'Server error',
