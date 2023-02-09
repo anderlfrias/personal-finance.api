@@ -63,4 +63,14 @@ module.exports.routes = {
   'PUT /api/v1/category/:id': 'CategoryController.update',
   'DELETE /api/v1/category/:id': 'CategoryController.delete',
   /*=====  End of Routes of CategoryController  ======*/
+
+  /*=============================================
+  =         Routes of TransactionController    =
+  =============================================*/
+  'GET /api/v1/transaction': 'TransactionController.get',
+  'GET /api/v1/transaction/:id': 'TransactionController.getById',
+  'POST /api/v1/transaction': 'TransactionController.create',
+  'PUT /api/v1/transaction/:id': 'TransactionController.update',
+  'DELETE /api/v1/transaction/:id': 'TransactionController.delete',
+  /*=====  End of Routes of TransactionController  ======*/
 };
