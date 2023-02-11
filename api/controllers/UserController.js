@@ -208,27 +208,19 @@ module.exports = {
 
   login: async function (req, res) {
     try {
-      const { username, email, password } = req.body;
+      const { user : userToLoging, password } = req.body;
 
-      let user = null;
-      if (username) {
-        user = await User.findOne({ username });
+      const byUsername = await User.findOne({ username: userToLoging});
+      const byEmail = await User.findOne({ email: userToLoging });
+
+      if (!byUsername && !byEmail){
+        return res.badRequest({
+          message: 'Failed to authenticate',
+        });
       }
 
-      if (email) {
-        user = await User.findOne({ email });
-      }
+      const user = byUsername || byEmail;
 
-      // const user = await User.findOne({
-      //   where: {
-      //     or: [
-      //       { username },
-      //       { email },
-      //     ],
-      //   },
-      // });
-
-      console.log(user);
       if (!user || !password) {
         return res.badRequest({
           message: 'Missing fields',
