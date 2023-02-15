@@ -73,4 +73,14 @@ module.exports.routes = {
   'PUT /api/v1/transaction/:id': 'TransactionController.update',
   'DELETE /api/v1/transaction/:id': 'TransactionController.delete',
   /*=====  End of Routes of TransactionController  ======*/
+
+  /*=============================================
+  =         Routes of BudgetController         =
+  =============================================*/
+  'GET /api/v1/budget': 'BudgetController.get',
+  'GET /api/v1/budget/:id': 'BudgetController.getById',
+  'POST /api/v1/budget': 'BudgetController.create',
+  'PUT /api/v1/budget/:id': 'BudgetController.update',
+  'DELETE /api/v1/budget/:id': 'BudgetController.delete',
+  /*=====  End of Routes of BudgetController  ======*/
 };
