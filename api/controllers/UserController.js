@@ -215,7 +215,8 @@ module.exports = {
 
       if (!byUsername && !byEmail){
         return res.badRequest({
-          message: 'Failed to authenticate',
+          messageCode: 'E_INVALID_CREDENTIALS',
+          message: 'Invalid credentials',
         });
       }
 
@@ -231,7 +232,7 @@ module.exports = {
 
       if (!isPasswordValid) {
         return res.badRequest({
-          message: 'Failed to authenticate',
+          message: 'Invalid credentials',
         });
       }
 
@@ -250,6 +251,13 @@ module.exports = {
       };
 
       const jwt = sign(data, secret);
+
+      if (!jwt) {
+        return res.badRequest({
+          messageCode: 'E_FAILED_TO_AUTHENTICATE',
+          message: 'Failed to authenticate user',
+        });
+      }
 
       return res.ok({
         message: 'User authenticated',
