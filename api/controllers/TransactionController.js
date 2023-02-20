@@ -8,7 +8,7 @@
 module.exports = {
   create: async function (req, res) {
     try {
-      const { amount, type, description, evidence, category, wallet } = req.allParams();
+      const { amount, type, description, date, evidence, category, wallet } = req.allParams();
 
       if (!amount || !type || !wallet) {
         return res.badRequest({ message: 'Missing fields' });
@@ -42,7 +42,7 @@ module.exports = {
       const transaction = await Transaction.create({
         amount,
         type,
-        date : new Date().toISOString(),
+        date,
         description,
         evidence,
         category,

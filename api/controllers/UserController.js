@@ -20,6 +20,24 @@ module.exports = {
         password: unencryptedPassword,
       } = req.body;
 
+      const userExists = await User.findOne({ username: username.trim().toLowerCase() });
+
+      if (userExists) {
+        return res.badRequest({
+          message: 'User already exists',
+          messageCode: 'user-exists',
+        });
+      }
+
+      const emailExists = await User.findOne({ email: email.trim().toLowerCase() });
+
+      if (emailExists) {
+        return res.badRequest({
+          message: 'Email already exists',
+          messageCode: 'email-exists',
+        });
+      }
+
       if (!name || !firstSurname || !email || !username || !unencryptedPassword) {
         return res.badRequest({
           message: 'Missing fields',
@@ -104,6 +122,15 @@ module.exports = {
       if (!id) {
         return res.badRequest({
           message: 'Id not provided',
+        });
+      }
+
+      const userExists = await User.findOne({ id });
+
+      if (!userExists) {
+        return res.badRequest({
+          message: 'User does not exist',
+          messageCode: 'user-not-found'
         });
       }
 
