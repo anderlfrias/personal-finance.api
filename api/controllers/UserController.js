@@ -237,8 +237,8 @@ module.exports = {
     try {
       const { user : userToLoging, password } = req.body;
 
-      const byUsername = await User.findOne({ username: userToLoging});
-      const byEmail = await User.findOne({ email: userToLoging });
+      const byUsername = await User.find({ username: userToLoging}).limit(1);
+      const byEmail = await User.find({ email: userToLoging }).limit(1);
 
       if (!byUsername && !byEmail){
         return res.badRequest({
@@ -247,7 +247,7 @@ module.exports = {
         });
       }
 
-      const user = byUsername || byEmail;
+      const user = byUsername[0] || byEmail[0];
 
       if (!user || !password) {
         return res.badRequest({
@@ -255,6 +255,7 @@ module.exports = {
         });
       }
 
+      // Load hash from your password DB.
       const isPasswordValid = bcrypt.compareSync(password, user.password);
 
       if (!isPasswordValid) {

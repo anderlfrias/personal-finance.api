@@ -5,10 +5,11 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 
+const jwtDecode = require('jwt-decode');
 module.exports = {
   create: async function (req, res) {
     try {
-      const { amount, type, description, date, evidence, category, wallet, user } = req.allParams();
+      const { amount, type, description, date, evidence, category, wallet, user } = req.body;
 
       if (!user || !wallet || !amount || !type ) {
         return res.badRequest({ message: 'Missing fields' });
@@ -139,7 +140,24 @@ module.exports = {
   },
   get: async function (req, res) {
     try {
-      const transactions = await Transaction.find();
+      const { authorization : token } = req.headers;
+      const { startDate, endDate, category, wallet } = req.query;
+
+      if (!token) {
+        return res.badRequest({ message: 'Token not provided' });
+      }
+
+      const { id } = jwtDecode(token);
+      const transactions = await Transaction.find()
+        .where({
+          user: id,
+          date: {
+            '>=': startDate,
+            '<=': endDate,
+          },
+          category,
+          wallet,
+        });
 
       if (!transactions) {
         return res.badRequest({ message: 'Failed to get transactions' });
