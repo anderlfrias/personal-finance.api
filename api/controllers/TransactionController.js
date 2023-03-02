@@ -8,9 +8,9 @@
 module.exports = {
   create: async function (req, res) {
     try {
-      const { amount, type, description, date, evidence, category, wallet } = req.allParams();
+      const { amount, type, description, date, evidence, category, wallet, user } = req.allParams();
 
-      if (!amount || !type || !wallet) {
+      if (!user || !wallet || !amount || !type ) {
         return res.badRequest({ message: 'Missing fields' });
       }
 
@@ -47,6 +47,7 @@ module.exports = {
         evidence,
         category,
         wallet,
+        user
       }).fetch();
 
       if (!transaction) {
