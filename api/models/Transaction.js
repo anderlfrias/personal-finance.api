@@ -51,6 +51,10 @@ module.exports = {
       model: 'wallet',
       required: true,
     },
+    user: {
+      model: 'user',
+      required: true,
+    }
   },
 
 };
