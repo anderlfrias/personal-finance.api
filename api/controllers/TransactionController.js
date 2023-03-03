@@ -141,7 +141,11 @@ module.exports = {
   get: async function (req, res) {
     try {
       const { authorization : token } = req.headers;
-      const { startDate, endDate, category, wallet } = req.query;
+      const { q, startDate, endDate, category, wallet } = req.query;
+
+      if (!startDate || !endDate) {
+        return res.badRequest({ message: 'Missing fields' });
+      }
 
       if (!token) {
         return res.badRequest({ message: 'Token not provided' });
@@ -151,13 +155,18 @@ module.exports = {
       const transactions = await Transaction.find()
         .where({
           user: id,
+          category,
+          wallet,
           date: {
             '>=': startDate,
             '<=': endDate,
           },
-          category,
-          wallet,
-        });
+          description : { contains: q || '', },
+        })
+        .meta({ enableExperimentalDeepTargets: true })
+        .populate('category')
+        .populate('wallet')
+        .sort('date DESC');
 
       if (!transactions) {
         return res.badRequest({ message: 'Failed to get transactions' });
