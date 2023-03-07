@@ -12,7 +12,7 @@ module.exports = {
       const { name, balance, description, user } = req.body;
 
       if (!name || !balance || !user) {
-        return res.badRequest({ message: 'Missing fields' });
+        return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
       }
 
       const wallet = await Wallet.create({ name, balance, description, user, }).fetch();
@@ -20,6 +20,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }
@@ -42,6 +43,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }
@@ -66,6 +68,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }
@@ -92,6 +95,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }
@@ -122,6 +126,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }

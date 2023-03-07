@@ -12,19 +12,19 @@ module.exports = {
       const { amount, type, description, date, evidence, category, wallet, user } = req.body;
 
       if (!user || !wallet || !amount || !type ) {
-        return res.badRequest({ message: 'Missing fields' });
+        return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
       }
 
       // Upadate wallet balance
       const walletToUpdate = await Wallet.findOne({ id: wallet });
 
       if (!walletToUpdate) {
-        return res.badRequest({ message: 'Wallet not found' });
+        return res.badRequest({ message: 'Wallet not found', messageCode: 'wallet_not_found' });
       }
 
       if (type === 'expense') {
         if (walletToUpdate.balance < amount) {
-          return res.badRequest({ message: 'Insufficient funds' });
+          return res.badRequest({ message: 'Insufficient funds', messageCode: 'insufficient_funds' });
         }
 
         const walletUpdated = await Wallet.updateOne({ id: wallet }).set({ balance: walletToUpdate.balance - amount });
@@ -36,7 +36,7 @@ module.exports = {
       if (type === 'income') {
         const walletUpdated = await Wallet.updateOne({ id: wallet }).set({ balance: walletToUpdate.balance + amount });
         if (!walletUpdated) {
-          return res.badRequest({ message: 'Failed to update wallet balanc' });
+          return res.badRequest({ message: 'Failed to update wallet balance' });
         }
       }
 
@@ -59,6 +59,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }
@@ -85,6 +86,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }
@@ -134,6 +136,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }
@@ -176,6 +179,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }
@@ -198,6 +202,7 @@ module.exports = {
     } catch (error) {
       return res.serverError({
         message: 'Server error',
+        messageCode: 'server_error',
         error,
       });
     }
