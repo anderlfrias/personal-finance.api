@@ -130,6 +130,36 @@ module.exports = {
         error,
       });
     }
+  },
+
+  getTotalBalance: async (req, res) => {
+    try {
+      const {authorization : token } = req.headers;
+
+      if (!token) {
+        return res.badRequest({ message: 'Token not provided' });
+      }
+
+      const user = jwtDecode(token);
+
+      const wallets = await Wallet.find().where({ user: user.id });
+
+      const totalBalance = wallets.reduce((acc, wallet) => {
+        return acc + wallet.balance;
+      }, 0);
+
+      if (totalBalance){
+        return res.ok( totalBalance );
+      }
+
+      return res.badRequest({ message: 'Error', messageCode: 'error'});
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        messageCode: 'server_error',
+        error,
+      });
+    }
   }
 };
 
