@@ -81,6 +81,7 @@ module.exports = {
 
   get: async (req, res) => {
     try {
+      const { q } = req.query;
       const { authorization: token } = req.headers;
 
       if (!token) {
@@ -89,7 +90,12 @@ module.exports = {
 
       const user = jwtDecode(token);
 
-      const categories = await Category.find({ user: user.id });
+      const categories = await Category.find({
+        where: {
+          user: user.id,
+          name: { contains: q },
+        },
+      }).meta({ makeLikeModifierCaseInsensitive: true });
       res.ok( categories );
     } catch (error) {
       return res.serverError({

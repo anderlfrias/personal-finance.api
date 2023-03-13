@@ -144,28 +144,37 @@ module.exports = {
   get: async function (req, res) {
     try {
       const { authorization : token } = req.headers;
-      const { q, startDate, endDate, category, wallet } = req.query;
-
-      if (!startDate || !endDate) {
-        return res.badRequest({ message: 'Missing fields' });
-      }
+      const { q, startDate, endDate, categories = '', wallets = '' } = req.query;
 
       if (!token) {
         return res.badRequest({ message: 'Token not provided' });
       }
 
       const { id } = jwtDecode(token);
+
+      const dateRange = startDate && endDate ? {
+        '>=': startDate,
+        '<=': endDate,
+      } : startDate && !endDate ? {
+        '>=': startDate,
+      } : !startDate && endDate ? {
+        '<=': endDate,
+      } : null;
+
+      const where = {
+        user: id,
+        category : { in : categories.split(',')},
+        wallet: { in: wallets.split(',')},
+        date: dateRange,
+        description : { contains: q || '', },
+      };
+
+      !where.date && delete where.date;
+      !where.category.in[0] && delete where.category;
+      !where.wallet.in[0] && delete where.wallet;
+
       const transactions = await Transaction.find()
-        .where({
-          user: id,
-          category,
-          wallet,
-          date: {
-            '>=': startDate,
-            '<=': endDate,
-          },
-          description : { contains: q || '', },
-        })
+        .where(where)
         .meta({ enableExperimentalDeepTargets: true })
         .populate('category')
         .populate('wallet')
