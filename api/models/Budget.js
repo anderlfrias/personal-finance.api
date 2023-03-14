@@ -46,10 +46,10 @@ module.exports = {
       model: 'user',
       required: true,
     },
-    category: {
-      model: 'category',
-      required: true,
-    },
+    transactions: {
+      collection: 'transaction',
+      via: 'budget'
+    }
   },
 
 };

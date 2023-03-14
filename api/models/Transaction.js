@@ -54,6 +54,10 @@ module.exports = {
     user: {
       model: 'user',
       required: true,
+    },
+    budget: {
+      model: 'budget',
+      required: false
     }
   },
 
