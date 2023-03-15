@@ -27,9 +27,6 @@ module.exports = {
       type: 'string',
       required: true,
     },
-    description: {
-      type: 'string'
-    },
     amount: {
       type: 'number',
       required: true,

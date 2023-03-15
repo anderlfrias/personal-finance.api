@@ -8,7 +8,7 @@
 module.exports = {
   create: async function (req, res) {
     try {
-      const { name, description, amount, startDate, endDate, user } = req.body;
+      const { name, amount, startDate, endDate, user } = req.body;
 
       if (!name || !amount || !startDate || !endDate || !user) {
         return res.badRequest({
@@ -19,7 +19,6 @@ module.exports = {
 
       const budget = await Budget.create({
         name,
-        description,
         amount,
         startDate,
         endDate,
@@ -46,7 +45,7 @@ module.exports = {
   },
   update: async function (req, res) {
     try {
-      const { name, description, amount, startDate, endDate } = req.body;
+      const { name, amount, startDate, endDate } = req.body;
       const { id } = req.params;
 
       if (!id) {
@@ -65,7 +64,6 @@ module.exports = {
 
       const budget = await Budget.updateOne({ id }).set({
         name,
-        description,
         amount,
         startDate,
         endDate
