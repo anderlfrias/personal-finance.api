@@ -8,19 +8,9 @@
 module.exports = {
   create: async function (req, res) {
     try {
-      const { name, description, amount, startDate, endDate, category } = req.body;
-      const {authorization : token } = req.headers;
+      const { name, description, amount, startDate, endDate, user } = req.body;
 
-      if (!token) {
-        return res.badRequest({
-          messageCode: 'E_UNAUTHORIZED',
-          message: 'Token not provided',
-        });
-      }
-
-      const {id : user} = jwtDecode(token);
-
-      if (!name || !amount || !startDate || !endDate || !category || !user) {
+      if (!name || !amount || !startDate || !endDate || !user) {
         return res.badRequest({
           messageCode: 'E_MISSING_FIELDS',
           message: 'Missing required fields',
@@ -33,13 +23,12 @@ module.exports = {
         amount,
         startDate,
         endDate,
-        category,
         user
       });
 
       if (!budget) {
         return res.badRequest({
-          messageCode: 'E_FAILED_TO_CREATE_BUDGET',
+          messageCode: 'failed_to_create_budget',
           message: 'Budget could not be created',
         });
       }
@@ -49,7 +38,7 @@ module.exports = {
       });
     } catch (error) {
       return res.serverError({
-        messageCode: 'E_SERVER_ERROR',
+        messageCode: 'server_error',
         message: 'Server error',
         error,
       });
@@ -57,7 +46,7 @@ module.exports = {
   },
   update: async function (req, res) {
     try {
-      const { name, description, amount, startDate, endDate, category } = req.body;
+      const { name, description, amount, startDate, endDate } = req.body;
       const { id } = req.params;
 
       if (!id) {
@@ -67,7 +56,7 @@ module.exports = {
         });
       }
 
-      if (!name || !amount || !startDate || !endDate || !category) {
+      if (!name || !amount || !startDate || !endDate) {
         return res.badRequest({
           messageCode: 'E_MISSING_FIELDS',
           message: 'Missing required fields',
@@ -79,13 +68,12 @@ module.exports = {
         description,
         amount,
         startDate,
-        endDate,
-        category
+        endDate
       });
 
       if (!budget) {
         return res.badRequest({
-          messageCode: 'E_FAILED_TO_UPDATE_BUDGET',
+          messageCode: 'failed_to_update_budget',
           message: 'Budget could not be updated',
         });
       }
@@ -95,7 +83,38 @@ module.exports = {
       });
     } catch (error) {
       return res.serverError({
-        messageCode: 'E_SERVER_ERROR',
+        messageCode: 'server_error',
+        message: 'Server error',
+        error,
+      });
+    }
+  },
+  delete: async function (req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.badRequest({
+          messageCode: 'id_not_provided',
+          message: 'Id not provided',
+        });
+      }
+
+      const budget = await Budget.destroyOne({ id });
+
+      if (!budget) {
+        return res.badRequest({
+          messageCode: 'failed_to_delete_budget',
+          message: 'Budget could not be deleted',
+        });
+      }
+
+      return res.ok({
+        budget
+      });
+    } catch (error) {
+      return res.serverError({
+        messageCode: 'server_error',
         message: 'Server error',
         error,
       });
@@ -103,11 +122,29 @@ module.exports = {
   },
   get: async function (req, res) {
     try {
-      const budgets = await Budget.find();
+      const { authorization : token } = req.headers;
+      const { q } = req.query;
+
+      if (!token) {
+        return res.badRequest({
+          messageCode: 'token_not_provided',
+          message: 'Token not provided',
+        });
+      }
+
+      const { id } = jwtDecode(token);
+
+      const budgets = await Budget.find()
+        .where({
+          user: id,
+          name: { contains: q || '' }
+        })
+        .meta({ enableExperimentalDeepTargets: true })
+        .populate('transactions');
 
       if (!budgets) {
         return res.badRequest({
-          messageCode: 'E_FAILED_TO_GET_BUDGETS',
+          messageCode: 'failed_to_get_budgets',
           message: 'Budgets could not be retrieved',
         });
       }
@@ -115,7 +152,7 @@ module.exports = {
       return res.ok(budgets);
     } catch (error) {
       return res.serverError({
-        messageCode: 'E_SERVER_ERROR',
+        messageCode: 'server_error',
         message: 'Server error',
         error,
       });
@@ -127,7 +164,7 @@ module.exports = {
 
       if (!id) {
         return res.badRequest({
-          messageCode: 'E_ID_NOT_PROVIDED',
+          messageCode: 'id_not_provided',
           message: 'Id not provided',
         });
       }
@@ -136,7 +173,7 @@ module.exports = {
 
       if (!budget) {
         return res.badRequest({
-          messageCode: 'E_FAILED_TO_GET_BUDGET',
+          messageCode: 'failed_to_get_budget',
           message: 'Budget could not be retrieved',
         });
       }
