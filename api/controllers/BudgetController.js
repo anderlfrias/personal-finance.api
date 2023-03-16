@@ -5,6 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 
+const jwtDecode = require('jwt-decode');
 module.exports = {
   create: async function (req, res) {
     try {
@@ -12,8 +13,17 @@ module.exports = {
 
       if (!name || !amount || !startDate || !endDate || !user) {
         return res.badRequest({
-          messageCode: 'E_MISSING_FIELDS',
+          messageCode: 'missing_fields',
           message: 'Missing required fields',
+        });
+      }
+
+      const userExist = await User.findOne({ id: user });
+
+      if (!userExist) {
+        return res.badRequest({
+          messageCode: 'user_does_not_existd',
+          message: 'User does not exist',
         });
       }
 
@@ -23,7 +33,7 @@ module.exports = {
         startDate,
         endDate,
         user
-      });
+      }).fetch();
 
       if (!budget) {
         return res.badRequest({
