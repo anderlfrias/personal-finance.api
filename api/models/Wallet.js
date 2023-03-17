@@ -29,7 +29,7 @@ module.exports = {
     },
     balance: {
       type: 'number',
-      required: true,
+      defaultsTo: 0.0,
     },
     description: {
       type: 'string',

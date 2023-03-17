@@ -147,7 +147,7 @@ module.exports = {
           user: id,
           name: { contains: q || '' }
         })
-        .meta({ enableExperimentalDeepTargets: true })
+        .meta({ enableExperimentalDeepTargets: true, makeLikeModifierCaseInsensitive: true })
         .populate('transactions');
 
       if (!budgets) {

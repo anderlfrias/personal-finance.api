@@ -9,13 +9,13 @@ const jwtDecode = require('jwt-decode');
 module.exports = {
   create: async (req, res) => {
     try {
-      const { name, balance, description, user } = req.body;
+      const { name, description, user } = req.body;
 
-      if (!name || !balance || !user) {
+      if (!name || !user) {
         return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
       }
 
-      const wallet = await Wallet.create({ name, balance, description, user, }).fetch();
+      const wallet = await Wallet.create({ name, description, user, }).fetch();
       res.ok({wallet});
     } catch (error) {
       return res.serverError({
@@ -29,13 +29,13 @@ module.exports = {
   update: async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, balance, description } = req.body;
+      const { name, description } = req.body;
 
       if (!id) {
         return res.badRequest({ message: 'Missing fields' });
       }
 
-      const wallet = await Wallet.updateOne({ id }).set({ name, balance, description });
+      const wallet = await Wallet.updateOne({ id }).set({ name, description });
       res.ok({
         message: 'Wallet updated',
         wallet,
