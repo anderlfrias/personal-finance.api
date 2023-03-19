@@ -9,7 +9,7 @@ const jwtDecode = require('jwt-decode');
 module.exports = {
   create: async function (req, res) {
     try {
-      const { amount, type, description, date, evidence, category, wallet, user } = req.body;
+      const { amount, type, description, date, evidence, category, wallet, budget, user } = req.body;
 
       if (!user || !wallet || !amount || !type ) {
         return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
@@ -48,6 +48,7 @@ module.exports = {
         evidence,
         category,
         wallet,
+        budget,
         user
       }).fetch();
 

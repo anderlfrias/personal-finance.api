@@ -131,7 +131,8 @@ module.exports = {
   get: async function (req, res) {
     try {
       const { authorization : token } = req.headers;
-      const { q } = req.query;
+      const { q} = req.query;
+      const active = req.query.active === 'true' ? true : false;
 
       if (!token) {
         return res.badRequest({
@@ -141,6 +142,27 @@ module.exports = {
       }
 
       const { id } = jwtDecode(token);
+
+      if (active) {
+        const budgets = await Budget.find()
+          .where({
+            user: id,
+            name: { contains: q || '' },
+            startDate: { '<=': new Date().toISOString() },
+            endDate: { '>=': new Date().toISOString() }
+          })
+          .meta({ enableExperimentalDeepTargets: true, makeLikeModifierCaseInsensitive: true })
+          .populate('transactions');
+
+        if (!budgets) {
+          return res.badRequest({
+            messageCode: 'failed_to_get_budgets',
+            message: 'Budgets could not be retrieved',
+          });
+        }
+
+        return res.ok(budgets);
+      }
 
       const budgets = await Budget.find()
         .where({
