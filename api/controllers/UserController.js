@@ -237,24 +237,24 @@ module.exports = {
     try {
       const { user : userToLoging, password } = req.body;
 
+      if (!userToLoging || !password) {
+        return res.badRequest({
+          messageCode: 'missing_fields',
+          message: 'Missing fields',
+        });
+      }
+
       const byUsername = await User.find({ username: userToLoging}).limit(1);
       const byEmail = await User.find({ email: userToLoging }).limit(1);
 
-      if (!byUsername && !byEmail){
+      if (!byUsername[0] && !byEmail[0]){
         return res.badRequest({
-          messageCode: 'E_INVALID_CREDENTIALS',
+          messageCode: 'invalid_credentials',
           message: 'Invalid credentials',
         });
       }
 
       const user = byUsername[0] || byEmail[0];
-
-      if (!user || !password) {
-        return res.badRequest({
-          message: 'Missing fields',
-        });
-      }
-
       // Load hash from your password DB.
       const isPasswordValid = bcrypt.compareSync(password, user.password);
 
@@ -282,7 +282,7 @@ module.exports = {
 
       if (!jwt) {
         return res.badRequest({
-          messageCode: 'E_FAILED_TO_AUTHENTICATE',
+          messageCode: 'failed_to_login',
           message: 'Failed to authenticate user',
         });
       }
