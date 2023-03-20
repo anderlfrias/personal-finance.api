@@ -131,7 +131,7 @@ module.exports = {
   get: async function (req, res) {
     try {
       const { authorization : token } = req.headers;
-      const { q} = req.query;
+      const { q } = req.query;
       const active = req.query.active === 'true' ? true : false;
 
       if (!token) {
@@ -152,7 +152,8 @@ module.exports = {
             endDate: { '>=': new Date().toISOString() }
           })
           .meta({ enableExperimentalDeepTargets: true, makeLikeModifierCaseInsensitive: true })
-          .populate('transactions');
+          .populate('transactions')
+          .sort('endDate DESC');
 
         if (!budgets) {
           return res.badRequest({
@@ -170,7 +171,8 @@ module.exports = {
           name: { contains: q || '' }
         })
         .meta({ enableExperimentalDeepTargets: true, makeLikeModifierCaseInsensitive: true })
-        .populate('transactions');
+        .populate('transactions')
+        .sort('endDate DESC');
 
       if (!budgets) {
         return res.badRequest({
