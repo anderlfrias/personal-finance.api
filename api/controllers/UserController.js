@@ -260,6 +260,7 @@ module.exports = {
 
       if (!isPasswordValid) {
         return res.badRequest({
+          messageCode: 'invalid_credentials',
           message: 'Invalid credentials',
         });
       }
