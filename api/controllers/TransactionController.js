@@ -106,8 +106,10 @@ module.exports = {
         return res.badRequest({ message: 'Transaction not found' });
       }
 
+      console.log(transactionToDelete);
+
       // Upadate wallet balance
-      const walletToUpdate = await Wallet.findOne({ wallet: transactionToDelete.wallet });
+      const walletToUpdate = await Wallet.findOne({ id: transactionToDelete.wallet });
 
       if (!walletToUpdate) {
         return res.badRequest({ message: 'Wallet not found' });
@@ -202,7 +204,10 @@ module.exports = {
         return res.badRequest({ message: 'Id not provided' });
       }
 
-      const transaction = await Transaction.findOne({ id });
+      const transaction = await Transaction.findOne({ id })
+        .populate('category')
+        .populate('wallet')
+        .populate('budget');
 
       if (!transaction) {
         return res.badRequest({ message: 'Transaction not found' });
