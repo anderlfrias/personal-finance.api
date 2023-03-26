@@ -48,7 +48,7 @@ module.exports = {
         evidence,
         category,
         wallet,
-        budget,
+        budget: budget || null,
         user
       }).fetch();
 
@@ -68,7 +68,7 @@ module.exports = {
   update: async function (req, res) {
     try {
       const { id } = req.params;
-      const { description, evidence } = req.allParams();
+      const { description, evidence, category, budget } = req.allParams();
 
       if (!id) {
         return res.badRequest({ message: 'Id not provided' });
@@ -77,6 +77,8 @@ module.exports = {
       const transactionUpdated = await Transaction.updateOne({ id }).set({
         description,
         evidence,
+        category: category || null,
+        budget: budget || null
       });
 
       if (!transactionUpdated) {
