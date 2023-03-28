@@ -41,7 +41,8 @@ module.exports = {
       required: false,
     },
     evidence: {
-      type: 'string',
+      type: 'json',
+      columnType: 'array',
       required: false,
     },
     category: {

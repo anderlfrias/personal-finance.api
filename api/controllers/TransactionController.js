@@ -46,8 +46,8 @@ module.exports = {
         date,
         description,
         evidence,
-        category,
         wallet,
+        category: category || null,
         budget: budget || null,
         user
       }).fetch();
