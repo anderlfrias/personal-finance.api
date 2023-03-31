@@ -84,4 +84,9 @@ module.exports.routes = {
   'PUT /api/v1/budget/:id': 'BudgetController.update',
   'DELETE /api/v1/budget/:id': 'BudgetController.delete',
   /*=====  End of Routes of BudgetController  ======*/
+
+  /*=============================================
+  =         Routes of StatisticsController     =
+  =============================================*/
+  'GET /api/v1/statistics': 'StatisticsController.get',
 };

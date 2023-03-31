@@ -183,7 +183,8 @@ module.exports = {
         .meta({ enableExperimentalDeepTargets: true })
         .populate('category')
         .populate('wallet')
-        .sort('date DESC');
+        .sort('date DESC')
+        .select(['id', 'amount', 'type', 'date', 'description', 'category', 'wallet']);
 
       if (!transactions) {
         return res.badRequest({ message: 'Failed to get transactions' });

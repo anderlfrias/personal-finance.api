@@ -22,5 +22,8 @@ module.exports.policies = {
     create: true,
     login: true,
   },
+  StatisticsController: {
+    get: true,
+  },
 
 };
