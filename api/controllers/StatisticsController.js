@@ -49,56 +49,43 @@ module.exports = {
         return res.badRequest({ message: 'Failed to get transactions' });
       }
 
-      // let result = transactions;
-      // transactions.map((transaction, index, transactions) => { // Extract amounts
-      //   const date = new Date(transaction.date).toLocaleDateString();
-      //   const {amount, type} = transaction;
-
-      //   const previousTransaction = transactions[index - 1];
-      //   const previousDate = previousTransaction ? new Date(previousTransaction.date).toLocaleDateString() : null;
-
-      //   if (date !== previousDate) {
-      //     return;
-      //   }
-
-      //   if (type === 'expense') {
-      //     result[index - 1] = { ...transaction, amount: previousTransaction.amount + amount };
-      //   }
-
-      //   if (type === 'income') {
-      //     result[index - 1] = { ...transaction, amount: previousTransaction.amount - amount };
-      //   }
-      // });
-
-      // const labels = transactions.map((transaction) => { // Extract dates
-      //   const date = new Date(transaction.date).toLocaleDateString();
-      //   return date;
-      // }).filter((value, index, self) => { // Remove duplicates
-      //   return self.indexOf(value) === index;
-      // });
-
-      // Group transactions by date
-      const result = transactions.reduce((acc, transaction) => {
+      let result = new Array();
+      transactions.map((transaction, index, array) => {
         const date = new Date(transaction.date).toLocaleDateString();
         const { amount, type } = transaction;
 
-        if (!acc[date]) {
-          acc[date] = {
-            income: 0,
-            expense: 0,
-          };
+        if (index === 0) {
+          result.push({
+            date,
+            income: type === 'income' ? amount : 0,
+            expense: type === 'expense' ? amount : 0,
+          });
+          return;
         }
 
-        if (type === 'income') {
-          acc[date].income += amount;
+        const previousTransaction = array[index - 1];
+        const previousDate = new Date(previousTransaction.date).toLocaleDateString();
+
+        if (date === previousDate) {
+          if (type === 'income') {
+            result[result.length - 1].income += amount;
+          }
+
+          if (type === 'expense') {
+            result[result.length - 1].expense += amount;
+          }
         }
 
-        if (type === 'expense') {
-          acc[date].expense += amount;
+        if (date !== previousDate) {
+          result.push({
+            date,
+            income: type === 'income' ? amount : 0,
+            expense: type === 'expense' ? amount : 0,
+          });
         }
 
-        return acc;
-      }, {});
+        return;
+      });
 
       return res.ok( result );
     } catch (error) {
