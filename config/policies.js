@@ -21,9 +21,6 @@ module.exports.policies = {
   UserController: {
     create: true,
     login: true,
-  },
-  StatisticsController: {
-    get: true,
-  },
+  }
 
 };
