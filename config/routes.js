@@ -89,4 +89,5 @@ module.exports.routes = {
   =         Routes of StatisticsController     =
   =============================================*/
   'GET /api/v1/statistics': 'StatisticsController.get',
+  'GET /api/v1/statistics/timeframe': 'StatisticsController.getByTimeframe',
 };
