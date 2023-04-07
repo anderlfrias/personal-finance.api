@@ -163,7 +163,7 @@ module.exports = {
       const transactions = await Transaction.find()
         .where(where)
         .meta({ enableExperimentalDeepTargets: true })
-        .sort('date DESC')
+        .sort('date')
         .select(['id', 'amount', 'date', 'type']);
 
       if (!transactions) {
@@ -171,14 +171,16 @@ module.exports = {
       }
 
       if (timeFrame === 'week') {
+        const days = [ 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         const result = new Array();
         transactions.map((transaction, index, array) => {
           const { amount, type, date } = transaction;
           const day = new Date(date).getDay();
+          const dayName = days[day];
 
           if (index === 0) {
             result.push({
-              date: new Date(date).toLocaleDateString(),
+              date: dayName,
               income: type === 'income' ? amount : 0,
               expense: type === 'expense' ? amount : 0,
             });
@@ -200,7 +202,7 @@ module.exports = {
 
           if (day !== previousDay) {
             result.push({
-              date: new Date(date).toLocaleDateString(),
+              date: dayName,
               income: type === 'income' ? amount : 0,
               expense: type === 'expense' ? amount : 0,
             });
@@ -211,7 +213,7 @@ module.exports = {
       }
 
       if (timeFrame === 'month') {
-        let result = new Array();
+        const result = new Array();
         transactions.map((transaction, index, array) => {
           const date = new Date(transaction.date).toLocaleDateString();
           const { amount, type } = transaction;
@@ -252,8 +254,65 @@ module.exports = {
       }
 
       if (timeFrame === 'year') {
-        // const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
-        let result = transactions;
+        const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+        const result = new Array();
+        transactions.map((transaction, index, array) => {
+          const { amount, type, date } = transaction;
+          const month = new Date(date).getMonth();
+          const monthName = months[month];
+
+          if (index === 0) {
+            result.push({
+              date: monthName,
+              income: type === 'income' ? amount : 0,
+              expense: type === 'expense' ? amount : 0,
+            });
+            return;
+          }
+
+          const previousTransaction = array[index - 1];
+          const previousMonth = new Date(previousTransaction.date).getMonth();
+
+          if (month === previousMonth) {
+            if (type === 'income') {
+              result[result.length - 1].income += amount;
+            }
+
+            if (type === 'expense') {
+              result[result.length - 1].expense += amount;
+            }
+          }
+
+          if (month !== previousMonth) {
+            result.push({
+              date: monthName,
+              income: type === 'income' ? amount : 0,
+              expense: type === 'expense' ? amount : 0,
+            });
+          }
+          // const { amount, type, date } = transaction;
+          // const month = new Date(date).getMonth();
+          // const monthName = months[month];
+
+          // if (!result[monthName]) {
+          //   result = {
+          //     ...result,
+          //     [monthName]:{
+          //       income: type === 'income' ? amount : 0,
+          //       expense: type === 'expense' ? amount : 0
+          //     }
+          //   };
+          //   return;
+          // }
+
+          // result = {
+          //   ...result,
+          //   [monthName]: {
+          //     ...result[monthName],
+          //     [type]: result[monthName][type] + amount
+          //   }
+          // };
+        });
 
         return res.ok( result );
       }
