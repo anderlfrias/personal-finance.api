@@ -180,7 +180,7 @@ module.exports = {
 
       const transactions = await Transaction.find()
         .where(where)
-        .meta({ enableExperimentalDeepTargets: true })
+        .meta({ makeLikeModifierCaseInsensitive: true })
         .populate('category')
         .populate('wallet')
         .sort('date DESC')
