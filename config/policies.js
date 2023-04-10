@@ -21,6 +21,7 @@ module.exports.policies = {
   UserController: {
     create: true,
     login: true,
+    activateAccount: true,
   }
 
 };

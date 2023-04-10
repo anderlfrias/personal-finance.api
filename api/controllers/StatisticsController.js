@@ -343,7 +343,6 @@ module.exports = {
 
       const dateRange = startDate && endDate ? { '>=': startDate, '<=': endDate } : null;
 
-      console.log(dateRange);
       const transactions = await Transaction.find()
         .where({ user: id, category: { '!=': null }, date: dateRange })
         .select(['date', 'category', 'amount', 'type'])

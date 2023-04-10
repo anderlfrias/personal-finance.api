@@ -55,7 +55,7 @@ module.exports = {
     },
     isActive: {
       type: 'boolean',
-      defaultsTo: true,
+      defaultsTo: false,
     },
     wallets: {
       collection: 'wallet',

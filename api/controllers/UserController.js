@@ -7,6 +7,7 @@
 
 const bcrypt = require('bcrypt');
 const sign = require('jwt-encode');
+const jwt = require('jsonwebtoken');
 module.exports = {
   create: async function (req, res) {
     try {
@@ -18,6 +19,7 @@ module.exports = {
         email,
         username,
         password: unencryptedPassword,
+        confirmEmailLink
       } = req.body;
 
       const userExists = await User.findOne({ username: username.trim().toLowerCase() });
@@ -25,7 +27,7 @@ module.exports = {
       if (userExists) {
         return res.badRequest({
           message: 'User already exists',
-          messageCode: 'user-exists',
+          messageCode: 'username_exists',
         });
       }
 
@@ -34,11 +36,11 @@ module.exports = {
       if (emailExists) {
         return res.badRequest({
           message: 'Email already exists',
-          messageCode: 'email-exists',
+          messageCode: 'email_exists',
         });
       }
 
-      if (!name || !firstSurname || !email || !username || !unencryptedPassword) {
+      if (!name || !firstSurname || !email || !username || !unencryptedPassword || !confirmEmailLink) {
         return res.badRequest({
           message: 'Missing fields',
         });
@@ -56,9 +58,31 @@ module.exports = {
       }).fetch();
 
       if (user) {
-        return res.ok({
-          user,
+        const secret = sails.config.session.secret;
+
+        const data = {
+          id: user.id,
+        };
+
+        const token = sign(data, secret);
+
+        sails.hooks.email.send('confirmEmail',
+        {
+          confirmLink: `${confirmEmailLink}/${token}`,
+          userFirstname: user.name,
+        },
+        {
+          to: user.email,
+          subject: 'Confirmación de correo',
+        },
+        (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('Correo enviado correctamente');
+          }
         });
+        return res.ok();
       }
 
       return res.badRequest({
@@ -75,7 +99,7 @@ module.exports = {
   update: async function (req, res) {
     try {
       const { id } = req.params;
-      const { name, firstSurname, secondSurname, role, isActive } = req.body;
+      const { name, firstSurname, secondSurname, role } = req.body;
 
       if (!id) {
         return res.badRequest({
@@ -94,7 +118,6 @@ module.exports = {
         firstSurname,
         secondSurname,
         role,
-        isActive,
       });
 
       if (user) {
@@ -255,6 +278,13 @@ module.exports = {
       }
 
       const user = byUsername[0] || byEmail[0];
+
+      if (!user.isActive) {
+        return res.badRequest({
+          messageCode: 'user_not_active',
+          message: 'User not active',
+        });
+      }
       // Load hash from your password DB.
       const isPasswordValid = bcrypt.compareSync(password, user.password);
 
@@ -300,6 +330,69 @@ module.exports = {
       });
     }
   },
+  activateAccount: async function (req, res) {
+    try {
+      const { authorization : token } = req.headers;
 
+      if (!token) {
+        return res.badRequest({ message: 'Token not provided' });
+      }
+
+      jwt.verify(token, sails.config.session.secret, async (_err, decoded) => {
+        if (_err) {
+          return res.badRequest({
+            message: 'Invalid token',
+            messageCode: 'invalid-token',
+          });
+        }
+
+        const { id } = decoded;
+        console.log(id);
+
+        if (!id) {
+          return res.badRequest({
+            message: 'Id not provided',
+            messageCode: 'id-not-provided',
+          });
+        }
+
+        const user = await User.findOne({ id });
+
+        if (!user) {
+          return res.badRequest({
+            message: 'User not found',
+            messageCode: 'user-not-found',
+          });
+        }
+
+        if (user.isActive) {
+          return res.ok({
+            message: 'User already activated',
+            messageCode: 'user-already-activated',
+          });
+        }
+
+        const userUpdated = await User.updateOne({ id }).set({
+          isActive: true,
+        });
+
+        if (userUpdated) {
+          return res.ok({
+            message: 'User activated'
+          });
+        }
+
+        return res.badRequest({
+          message: 'Error activating user',
+          messageCode: 'error-activating-user',
+        });
+      });
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
+      });
+    }
+  },
 };
 
