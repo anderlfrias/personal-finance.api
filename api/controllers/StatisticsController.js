@@ -326,5 +326,65 @@ module.exports = {
       });
     }
   },
+  getAverageByCategory: async (req, res) => {
+    try {
+      const { authorization : token } = req.headers;
+      const { startDate, endDate } = req.allParams();
+
+      if (!token) {
+        return res.badRequest({ message: 'Token not provided' });
+      }
+
+      const { id } = jwtDecode(token);
+
+      if (!id) {
+        return res.badRequest({ message: 'Invalid token' });
+      }
+
+      const dateRange = startDate && endDate ? { '>=': startDate, '<=': endDate } : null;
+
+      console.log(dateRange);
+      const transactions = await Transaction.find()
+        .where({ user: id, category: { '!=': null }, date: dateRange })
+        .select(['date', 'category', 'amount', 'type'])
+        .populate('category');
+
+      if (!transactions) {
+        return res.badRequest({ message: 'Failed to get transactions' });
+      }
+
+      const result = new Array();
+      transactions.map((transaction) => {
+        const { type, amount, category } = transaction;
+        const index = result.findIndex((item) => item.categoryId === category.id); // Verificar si ya hay un registro con esta categoria
+
+        if (index === -1) {
+          result.push({
+            categoryId: category.id,
+            category: category.name,
+            incomes: type === 'income' ? amount : 0,
+            expenses: type === 'expense' ? amount : 0
+          });
+          return;
+        }
+
+        if (type === 'income') {
+          result[index].incomes += amount;
+        }
+
+        if (type === 'expense') {
+          result[index].expenses += amount;
+        }
+      });
+
+      return res.ok( result );
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        messageCode: 'server_error',
+        error,
+      });
+    }
+  },
 };
 

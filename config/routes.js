@@ -90,4 +90,5 @@ module.exports.routes = {
   =============================================*/
   'GET /api/v1/statistics': 'StatisticsController.get',
   'GET /api/v1/statistics/timeframe': 'StatisticsController.getByTimeframe',
+  'GET /api/v1/statistics/category': 'StatisticsController.getAverageByCategory',
 };

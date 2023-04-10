@@ -149,7 +149,7 @@ module.exports = {
   get: async function (req, res) {
     try {
       const { authorization : token } = req.headers;
-      const { q, startDate, endDate, categories = '', wallets = '' } = req.query;
+      const { q, startDate, endDate, categories = '', wallets = '', top, skip } = req.query;
 
       if (!token) {
         return res.badRequest({ message: 'Token not provided' });
@@ -178,19 +178,22 @@ module.exports = {
       !where.category.in[0] && delete where.category;
       !where.wallet.in[0] && delete where.wallet;
 
+      const total = await Transaction.count({user: id});
       const transactions = await Transaction.find()
         .where(where)
         .meta({ makeLikeModifierCaseInsensitive: true })
         .populate('category')
         .populate('wallet')
         .sort('date DESC')
-        .select(['id', 'amount', 'type', 'date', 'description', 'category', 'wallet']);
+        .select(['id', 'amount', 'type', 'date', 'description', 'category', 'wallet'])
+        .limit(top || 10)
+        .skip(skip || 0);
 
       if (!transactions) {
         return res.badRequest({ message: 'Failed to get transactions' });
       }
 
-      return res.ok( transactions );
+      return res.ok({ transactions, total });
     } catch (error) {
       return res.serverError({
         message: 'Server error',
