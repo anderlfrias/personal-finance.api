@@ -43,6 +43,7 @@ module.exports.routes = {
   'PUT /api/v1/user/:id': 'UserController.update',
   'DELETE /api/v1/user/:id': 'UserController.delete',
   'POST /api/v1/user/confirm-email': 'UserController.activateAccount',
+  'POST /api/v1/user/send-confirmation-email': 'UserController.sendConfirmationEmail',
   /*=====  End of Routes of UserController  ======*/
 
   /*=============================================

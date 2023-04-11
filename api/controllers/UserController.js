@@ -7,6 +7,7 @@
 
 const bcrypt = require('bcrypt');
 const sign = require('jwt-encode');
+const jwtDecode = require('jwt-decode');
 const jwt = require('jsonwebtoken');
 module.exports = {
   create: async function (req, res) {
@@ -18,8 +19,7 @@ module.exports = {
         secondSurname,
         email,
         username,
-        password: unencryptedPassword,
-        confirmEmailLink
+        password: unencryptedPassword
       } = req.body;
 
       const userExists = await User.findOne({ username: username.trim().toLowerCase() });
@@ -40,7 +40,7 @@ module.exports = {
         });
       }
 
-      if (!name || !firstSurname || !email || !username || !unencryptedPassword || !confirmEmailLink) {
+      if (!name || !firstSurname || !email || !username || !unencryptedPassword) {
         return res.badRequest({
           message: 'Missing fields',
         });
@@ -57,38 +57,34 @@ module.exports = {
         password: encryptedPassword,
       }).fetch();
 
-      if (user) {
-        const secret = sails.config.session.secret;
+      const secret = sails.config.session.secret;
 
-        const data = {
-          id: user.id,
-        };
+      //Data to be encrypted
+      const data = {
+        id: user.id,
+        name: user.name,
+        firstSurname: user.firstSurname,
+        secondSurname: user.secondSurname,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        isActive: user.isActive,
+      };
 
-        const token = sign(data, secret);
+      const jwt = sign(data, secret);
 
-        sails.hooks.email.send('confirmEmail',
-        {
-          confirmLink: `${confirmEmailLink}/${token}`,
-          userFirstname: user.name,
-        },
-        {
-          to: user.email,
-          subject: 'Confirmación de correo',
-        },
-        (err) => {
-          if (err) {
-            return res.serverError({
-              message: 'Server error',
-              err,
-            });
-          }
-          return res.ok();
+      if (!jwt) {
+        return res.badRequest({
+          messageCode: 'failed_to_login',
+          message: 'Failed to authenticate user',
         });
       }
 
-      return res.badRequest({
-        message: 'Error creating user',
+      return res.ok({
+        message: 'User authenticated',
+        token: jwt,
       });
+
     } catch (err) {
       return res.serverError({
         message: 'Server error',
@@ -279,12 +275,12 @@ module.exports = {
 
       const user = byUsername[0] || byEmail[0];
 
-      if (!user.isActive) {
-        return res.badRequest({
-          messageCode: 'user_not_active',
-          message: 'User not active',
-        });
-      }
+      // if (!user.isActive) {
+      //   return res.badRequest({
+      //     messageCode: 'user_not_active',
+      //     message: 'User not active',
+      //   });
+      // }
       // Load hash from your password DB.
       const isPasswordValid = bcrypt.compareSync(password, user.password);
 
@@ -327,6 +323,63 @@ module.exports = {
       return res.serverError({
         message: 'Server error',
         err,
+      });
+    }
+  },
+  sendConfirmationEmail: async function (req, res) {
+    try {
+      const { authorization } = req.headers;
+      const { confirmEmailLink } = req.body;
+
+      const { id: userId } = jwtDecode(authorization);
+
+      if (!userId) {
+        return res.badRequest({
+          message: 'Missing fields',
+        });
+      }
+
+      const user = await User.findOne({ id: userId });
+
+      if (!user) {
+        return res.badRequest({
+          message: 'User not found',
+          messageCode: 'user-not-found',
+        });
+      }
+
+      const secret = sails.config.session.secret;
+      const data = {
+        id: user.id,
+      };
+
+      const token = sign(data, secret);
+
+      sails.hooks.email.send('confirmEmail',
+      {
+        confirmLink: `${confirmEmailLink}/${token}`,
+        userFirstname: user.name,
+      },
+      {
+        to: user.email,
+        subject: 'Confirmación de correo electrónico',
+      },
+      (err) => {
+        if (err) {
+          return res.serverError({
+            message: 'Server error',
+            err,
+          });
+        }
+
+        return res.ok({
+          message: 'Email sent',
+        });
+      });
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
       });
     }
   },

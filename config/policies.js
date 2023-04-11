@@ -22,6 +22,7 @@ module.exports.policies = {
     create: true,
     login: true,
     activateAccount: true,
+    sendConfirmationEmail: true,
   }
 
 };
