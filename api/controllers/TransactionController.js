@@ -108,8 +108,6 @@ module.exports = {
         return res.badRequest({ message: 'Transaction not found' });
       }
 
-      console.log(transactionToDelete);
-
       // Upadate wallet balance
       const walletToUpdate = await Wallet.findOne({ id: transactionToDelete.wallet });
 

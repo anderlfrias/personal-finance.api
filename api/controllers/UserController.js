@@ -77,12 +77,13 @@ module.exports = {
         },
         (err) => {
           if (err) {
-            console.log(err);
-          } else {
-            console.log('Correo enviado correctamente');
+            return res.serverError({
+              message: 'Server error',
+              err,
+            });
           }
+          return res.ok();
         });
-        return res.ok();
       }
 
       return res.badRequest({
@@ -217,7 +218,6 @@ module.exports = {
     try {
       const { q = '' } = req.allParams();
 
-      console.log(q);
       const users = await User.find({
         where: {
           or: [
@@ -347,7 +347,6 @@ module.exports = {
         }
 
         const { id } = decoded;
-        console.log(id);
 
         if (!id) {
           return res.badRequest({
