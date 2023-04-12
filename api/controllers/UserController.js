@@ -446,5 +446,59 @@ module.exports = {
       });
     }
   },
+  changePassword: async function (req, res) {
+    try {
+      const { password, newPassword, userId } = req.body;
+
+      if (!password || !newPassword || !userId) {
+        return res.badRequest({
+          message: 'Missing fields',
+          messageCode: 'missing-fields',
+        });
+      }
+
+      const user = await User.findOne({ id: userId });
+
+      if (!user) {
+        return res.badRequest({
+          message: 'User not found',
+          messageCode: 'user-not-found',
+        });
+      }
+
+      const isPasswordValid = bcrypt.compareSync(password, user.password);
+
+      if (!isPasswordValid) {
+        return res.badRequest({
+          message: 'Invalid password',
+          messageCode: 'invalid-password',
+        });
+      }
+
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(newPassword, salt);
+
+      const userUpdated = await User.updateOne({ id: userId }).set({
+        password: hash,
+      });
+
+      if (userUpdated) {
+        return res.ok({
+          message: 'Password updated',
+        });
+      }
+
+      return res.badRequest({
+        message: 'Error updating password',
+        messageCode: 'error-updating-password',
+      });
+
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
+      });
+    }
+  }
 };
 
