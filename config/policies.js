@@ -23,6 +23,7 @@ module.exports.policies = {
     login: true,
     activateAccount: true,
     sendConfirmationEmail: true,
+    forgetPassword: true
   }
 
 };

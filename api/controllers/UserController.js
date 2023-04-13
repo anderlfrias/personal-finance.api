@@ -96,7 +96,7 @@ module.exports = {
   update: async function (req, res) {
     try {
       const { id } = req.params;
-      const { name, firstSurname, secondSurname, role } = req.body;
+      const { name, firstSurname, secondSurname } = req.body;
 
       if (!id) {
         return res.badRequest({
@@ -104,7 +104,7 @@ module.exports = {
         });
       }
 
-      if (!name || !firstSurname || !email || !username || !password || !role) {
+      if (!name || !firstSurname) {
         return res.badRequest({
           message: 'Missing fields',
         });
@@ -113,8 +113,7 @@ module.exports = {
       const user = await User.updateOne({ id }).set({
         name,
         firstSurname,
-        secondSurname,
-        role,
+        secondSurname
       });
 
       if (user) {
@@ -448,7 +447,8 @@ module.exports = {
   },
   changePassword: async function (req, res) {
     try {
-      const { password, newPassword, userId } = req.body;
+      const { id:userId } = req.allParams();
+      const { password, newPassword } = req.body;
 
       if (!password || !newPassword || !userId) {
         return res.badRequest({
@@ -499,6 +499,60 @@ module.exports = {
         error,
       });
     }
-  }
+  },
+  forgetPassword: async function (req, res) {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.badRequest({
+          message: 'Missing fields',
+          messageCode: 'missing-fields',
+        });
+      }
+
+      const user = await User.find({ email }).limit(1);
+
+      console.log(user[0]);
+      if (!user[0]) {
+        return res.ok();
+      }
+
+      const secret = sails.config.session.secret;
+      const data = {
+        id: user.id,
+      };
+
+      const token = sign(data, secret);
+
+      sails.hooks.email.send('confirmEmail',
+      {
+        confirmLink: `${confirmEmailLink}/${token}`,
+        userFirstname: user.name,
+      },
+      {
+        to: user.email,
+        subject: 'Confirmación de correo electrónico',
+      },
+      (err) => {
+        if (err) {
+          return res.serverError({
+            message: 'Server error',
+            err,
+          });
+        }
+
+        return res.ok({
+          message: 'Email sent',
+        });
+      });
+
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
+      });
+    }
+  },
 };
 

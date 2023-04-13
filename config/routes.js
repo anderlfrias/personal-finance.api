@@ -44,6 +44,8 @@ module.exports.routes = {
   'DELETE /api/v1/user/:id': 'UserController.delete',
   'POST /api/v1/user/confirm-email': 'UserController.activateAccount',
   'POST /api/v1/user/send-confirmation-email': 'UserController.sendConfirmationEmail',
+  'PUT /api/v1/user/change-password/:id': 'UserController.changePassword',
+  'POST /api/v1/user/forgot-password': 'UserController.forgetPassword',
   /*=====  End of Routes of UserController  ======*/
 
   /*=============================================
