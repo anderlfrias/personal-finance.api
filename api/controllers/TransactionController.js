@@ -176,7 +176,10 @@ module.exports = {
       !where.category.in[0] && delete where.category;
       !where.wallet.in[0] && delete where.wallet;
 
-      const total = await Transaction.count({user: id});
+      const total = await Transaction.count()
+        .where(where)
+        .meta({ makeLikeModifierCaseInsensitive: true });
+
       const transactions = await Transaction.find()
         .where(where)
         .meta({ makeLikeModifierCaseInsensitive: true })

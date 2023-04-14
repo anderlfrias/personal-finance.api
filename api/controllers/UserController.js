@@ -502,7 +502,7 @@ module.exports = {
   },
   forgetPassword: async function (req, res) {
     try {
-      const { email } = req.body;
+      const { email, forgotPasswordLink } = req.body;
 
       if (!email) {
         return res.badRequest({
@@ -511,10 +511,10 @@ module.exports = {
         });
       }
 
-      const user = await User.find({ email }).limit(1);
+      const userExists = await User.find({ email }).limit(1);
+      const user = userExists[0];
 
-      console.log(user[0]);
-      if (!user[0]) {
+      if (!user) {
         return res.ok();
       }
 
@@ -525,14 +525,14 @@ module.exports = {
 
       const token = sign(data, secret);
 
-      sails.hooks.email.send('confirmEmail',
+      sails.hooks.email.send('forgotPassword',
       {
-        confirmLink: `${confirmEmailLink}/${token}`,
+        changePasswordLink: `${forgotPasswordLink}/${token}`,
         userFirstname: user.name,
       },
       {
         to: user.email,
-        subject: 'Confirmación de correo electrónico',
+        subject: 'Recuperación de contraseña',
       },
       (err) => {
         if (err) {
@@ -547,6 +547,63 @@ module.exports = {
         });
       });
 
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
+      });
+    }
+  },
+  resetPassword: async function (req, res) {
+    try {
+      const { authorization : token } = req.headers;
+      const { password } = req.body;
+
+      jwt.verify(token, sails.config.session.secret, async (_err, decoded) => {
+        if (_err) {
+          return res.badRequest({
+            message: 'Invalid token',
+            messageCode: 'invalid-token',
+          });
+        }
+
+        const { id } = decoded;
+
+        if (!id) {
+          return res.badRequest({
+            message: 'Id not provided',
+            messageCode: 'id-not-provided',
+          });
+        }
+
+        const user = await User.findOne({ id });
+
+        if (!user) {
+          return res.badRequest({
+            message: 'User not found',
+            messageCode: 'user-not-found',
+          });
+        }
+
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password, salt);
+
+        const userUpdated = await User.updateOne({ id: user.id }).set({
+          password: hash,
+        });
+
+        if (userUpdated) {
+          return res.ok({
+            message: 'Password updated',
+          });
+        }
+
+        return res.badRequest({
+          message: 'Error updating password',
+          messageCode: 'error-updating-password',
+        });
+
+      });
     } catch (error) {
       return res.serverError({
         message: 'Server error',

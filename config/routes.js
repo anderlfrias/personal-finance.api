@@ -46,6 +46,7 @@ module.exports.routes = {
   'POST /api/v1/user/send-confirmation-email': 'UserController.sendConfirmationEmail',
   'PUT /api/v1/user/change-password/:id': 'UserController.changePassword',
   'POST /api/v1/user/forgot-password': 'UserController.forgetPassword',
+  'POST /api/v1/user/reset-password': 'UserController.resetPassword',
   /*=====  End of Routes of UserController  ======*/
 
   /*=============================================
