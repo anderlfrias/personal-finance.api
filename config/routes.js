@@ -37,6 +37,7 @@ module.exports.routes = {
   =         Routes of UserController            =
   =============================================*/
   'GET /api/v1/user': 'UserController.get',
+  'GET /api/v1/user/total': 'UserController.getTotal',
   'GET /api/v1/user/:id': 'UserController.getById',
   'POST /api/v1/user': 'UserController.create',
   'POST /api/v1/user/login': 'UserController.login',

@@ -611,5 +611,49 @@ module.exports = {
       });
     }
   },
+  getTotal: async function (req, res) {
+    try {
+      const { authorization : token } = req.headers;
+
+      if (!token) {
+        return res.badRequest({ message: 'Token not provided' });
+      }
+
+      const { id } = jwtDecode(token);
+
+      if (!id) {
+        return res.badRequest({
+          message: 'Id not provided',
+          messageCode: 'id-not-provided',
+        });
+      }
+
+      const user = await User.findOne({ id });
+
+      if (!user) {
+        return res.badRequest({
+          message: 'User not found',
+          messageCode: 'user-not-found',
+        });
+      }
+
+      const transactions = await Transaction.count({ user: user.id });
+      const wallets = await Wallet.count({ user: user.id });
+      const categories = await Category.count({ user: user.id });
+      const budgets = await Budget.count({ user: user.id });
+
+      return res.ok({
+        transactions,
+        wallets,
+        categories,
+        budgets,
+      });
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        error,
+      });
+    }
+  }
 };
 

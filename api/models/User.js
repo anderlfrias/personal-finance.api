@@ -61,6 +61,10 @@ module.exports = {
       collection: 'wallet',
       via: 'user'
     },
+    deleted: {
+      type: 'boolean',
+      defaultsTo: false,
+    },
   },
 
 };
