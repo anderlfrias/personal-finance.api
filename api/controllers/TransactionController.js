@@ -147,7 +147,7 @@ module.exports = {
   get: async function (req, res) {
     try {
       const { authorization : token } = req.headers;
-      const { q, startDate, endDate, categories = '', wallets = '', top, skip } = req.query;
+      const { q, startDate, endDate, categories = '', wallets = '' } = req.query;
 
       if (!token) {
         return res.badRequest({ message: 'Token not provided' });
@@ -186,9 +186,7 @@ module.exports = {
         .populate('category')
         .populate('wallet')
         .sort('date DESC')
-        .select(['id', 'amount', 'type', 'date', 'description', 'category', 'wallet'])
-        .limit(top || 10)
-        .skip(skip || 0);
+        .select(['id', 'amount', 'type', 'date', 'description', 'category', 'wallet']);
 
       if (!transactions) {
         return res.badRequest({ message: 'Failed to get transactions' });
