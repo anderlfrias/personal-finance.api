@@ -28,12 +28,18 @@ module.exports.security = {
   *                                                                          *
   ***************************************************************************/
 
+  // cors: {
+  //   allRoutes: true,
+  //   allowOrigins: ['http://localhost:3000', 'http://172.20.1.63:3000', 'http://192.168.0.132:3000'],
+  //   allowCredentials: false,
+  //   allowRequestMethods: 'GET, POST, PUT, DELETE',
+  //   allowRequestHeaders: 'Content-Type, Authorization',
+  // },
+
   cors: {
     allRoutes: true,
-    allowOrigins: ['http://localhost:3000', 'http://172.20.1.63:3000', 'http://192.168.0.132:3000'],
-    allowCredentials: false,
-    allowRequestMethods: 'GET, POST, PUT, DELETE',
-    allowRequestHeaders: 'Content-Type, Authorization',
+    allowOrigins: '*',
+    allowRequestHeaders: 'Content-Type, Authorization, X-Requested-With, Cache-Control, Accept, Origin, X-Session-ID,Access-Control-Allow-Origin'
   },
 
 

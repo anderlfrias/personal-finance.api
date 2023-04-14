@@ -19,7 +19,8 @@ module.exports = {
         secondSurname,
         email,
         username,
-        password: unencryptedPassword
+        password: unencryptedPassword,
+        profilePic,
       } = req.body;
 
       const userExists = await User.findOne({ username: username.trim().toLowerCase() });
@@ -55,6 +56,7 @@ module.exports = {
         email: email.trim().toLowerCase(),
         username: username.trim().toLowerCase(),
         password: encryptedPassword,
+        profilePic,
       }).fetch();
 
       const secret = sails.config.session.secret;
@@ -69,6 +71,7 @@ module.exports = {
         username: user.username,
         role: user.role,
         isActive: user.isActive,
+        profilePic: user.profilePic,
       };
 
       const jwt = sign(data, secret);
@@ -96,7 +99,7 @@ module.exports = {
   update: async function (req, res) {
     try {
       const { id } = req.params;
-      const { name, firstSurname, secondSurname } = req.body;
+      const { name, firstSurname, secondSurname, profilePic } = req.body;
 
       if (!id) {
         return res.badRequest({
@@ -113,7 +116,8 @@ module.exports = {
       const user = await User.updateOne({ id }).set({
         name,
         firstSurname,
-        secondSurname
+        secondSurname,
+        profilePic,
       });
 
       if (user) {
@@ -195,6 +199,7 @@ module.exports = {
           username: user.username,
           role: user.role,
           isActive: user.isActive,
+          profilePic: user.profilePic,
         });
       }
 
@@ -302,6 +307,7 @@ module.exports = {
         username: user.username,
         role: user.role,
         isActive: user.isActive,
+        profilePic: user.profilePic,
       };
 
       const jwt = sign(data, secret);

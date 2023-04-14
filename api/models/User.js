@@ -53,6 +53,9 @@ module.exports = {
       isIn: ['admin', 'user'],
       defaultsTo: 'user',
     },
+    profilePic: {
+      type: 'string',
+    },
     isActive: {
       type: 'boolean',
       defaultsTo: false,
