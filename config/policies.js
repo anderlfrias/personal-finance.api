@@ -25,6 +25,8 @@ module.exports.policies = {
     sendConfirmationEmail: true,
     forgetPassword: true
   },
-  '/' : true,
+  HomeController: {
+    index: true
+  },
 
 };
