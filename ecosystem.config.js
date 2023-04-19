@@ -4,7 +4,7 @@ module.exports = {
     script: './app.js',
     autorestart: true,
     env: {
-      PORT: 1337,
+      PORT: 80,
     }
   }]
 };
