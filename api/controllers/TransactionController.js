@@ -9,9 +9,13 @@ const jwtDecode = require('jwt-decode');
 module.exports = {
   create: async function (req, res) {
     try {
-      const { amount, type, description, date, evidence, category, wallet, budget, user } = req.body;
+      const { amount, type, description, date, evidence, category, wallet, budget, user, wallets } = req.body;
 
-      if (!user || !wallet || !amount || !type ) {
+      if (!user || !amount || !type ) {
+        return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
+      }
+
+      if (type !== 'transfer' && !wallet) {
         return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
       }
 
@@ -38,6 +42,18 @@ module.exports = {
         if (!walletUpdated) {
           return res.badRequest({ message: 'Failed to update wallet balance' });
         }
+      }
+
+      if (type === 'transfer') {
+        if (!wallets || wallets.length !== 2) {
+          return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
+        }
+
+        wallets.map(async(wallet) => {
+          if (!wallet.id || !wallet.type) {
+            return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
+          }
+        });
       }
 
       const transaction = await Transaction.create({
