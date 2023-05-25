@@ -160,6 +160,49 @@ module.exports = {
         error,
       });
     }
+  },
+
+  trasnferBalance: async (req, res) => {
+    try {
+      const { sourceWalletId, targetWalletId, amount } = req.body;
+      const {authorization : token } = req.headers;
+
+      if (!token) {
+        return res.badRequest({ message: 'Token not provided' });
+      }
+
+      const user = jwtDecode(token);
+
+      if (!sourceWalletId || !targetWalletId || !amount) {
+        return res.badRequest({ message: 'Missing fields' });
+      }
+
+      const sourceWallet = await Wallet.findOne({ id: sourceWalletId, user: user.id });
+      const targetWallet = await Wallet.findOne({ id: targetWalletId, user: user.id });
+
+      if (!sourceWallet || !targetWallet) {
+        return res.badRequest({ message: 'Wallet not found' });
+      }
+
+      if (sourceWallet.balance < amount) {
+        return res.badRequest({ message: 'Insufficient balance' });
+      }
+
+      const updatedSourceWallet = await Wallet.updateOne({ id: sourceWalletId }).set({ balance: sourceWallet.balance - amount });
+      const updatedTargetWallet = await Wallet.updateOne({ id: targetWalletId }).set({ balance: targetWallet.balance + amount });
+
+      if (updatedSourceWallet && updatedTargetWallet) {
+        return res.ok({ message: 'Balance transfered', sourceWallet: updatedSourceWallet, targetWallet: updatedTargetWallet });
+      }
+
+      return res.badRequest({ message: 'Error transfering balance' });
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        messageCode: 'server_error',
+        error,
+      });
+    }
   }
 };
 
