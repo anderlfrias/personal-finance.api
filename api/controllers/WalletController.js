@@ -162,23 +162,16 @@ module.exports = {
     }
   },
 
-  trasnferBalance: async (req, res) => {
+  transfer: async (req, res) => {
     try {
       const { sourceWalletId, targetWalletId, amount } = req.body;
-      const {authorization : token } = req.headers;
-
-      if (!token) {
-        return res.badRequest({ message: 'Token not provided' });
-      }
-
-      const user = jwtDecode(token);
 
       if (!sourceWalletId || !targetWalletId || !amount) {
         return res.badRequest({ message: 'Missing fields' });
       }
 
-      const sourceWallet = await Wallet.findOne({ id: sourceWalletId, user: user.id });
-      const targetWallet = await Wallet.findOne({ id: targetWalletId, user: user.id });
+      const sourceWallet = await Wallet.findOne({ id: sourceWalletId });
+      const targetWallet = await Wallet.findOne({ id: targetWalletId });
 
       if (!sourceWallet || !targetWallet) {
         return res.badRequest({ message: 'Wallet not found' });

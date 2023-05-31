@@ -57,6 +57,7 @@ module.exports.routes = {
   'GET /api/v1/wallet/:id': 'WalletController.getById',
   'GET /api/v1/wallet/total/balance': 'WalletController.getTotalBalance',
   'POST /api/v1/wallet': 'WalletController.create',
+  'POST /api/v1/wallet/transfer': 'WalletController.transfer',
   'PUT /api/v1/wallet/:id': 'WalletController.update',
   'DELETE /api/v1/wallet/:id': 'WalletController.delete',
   /*=====  End of Routes of WalletController  ======*/
