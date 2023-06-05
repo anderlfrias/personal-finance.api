@@ -29,7 +29,7 @@ module.exports = {
     },
     type: {
       type: 'string',
-      isIn: ['income', 'expense'],
+      isIn: ['income', 'expense', 'transfer'],
       required: true,
     },
     date: {
@@ -50,7 +50,15 @@ module.exports = {
     },
     wallet: {
       model: 'wallet',
-      required: true,
+      required: false,
+    },
+    sourceWallet: {
+      model: 'wallet',
+      required: false,
+    },
+    targetWallet: {
+      model: 'wallet',
+      required: false,
     },
     user: {
       model: 'user',
@@ -59,7 +67,7 @@ module.exports = {
     budget: {
       model: 'budget',
       required: false
-    }
+    },
   },
 
 };
