@@ -52,11 +52,6 @@ module.exports = {
       model: 'wallet',
       required: false,
     },
-    wallets: {
-      type: 'json',
-      columnType: 'array',
-      required: false,
-    },
     user: {
       model: 'user',
       required: true,
