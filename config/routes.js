@@ -80,6 +80,7 @@ module.exports.routes = {
   'POST /api/v1/transaction': 'TransactionController.create',
   'PUT /api/v1/transaction/:id': 'TransactionController.update',
   'DELETE /api/v1/transaction/:id': 'TransactionController.delete',
+  'DELETE /api/v1/transaction/category/:id': 'TransactionController.deleteByCategory',
   /*=====  End of Routes of TransactionController  ======*/
 
   /*=============================================

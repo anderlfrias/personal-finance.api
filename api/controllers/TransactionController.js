@@ -29,7 +29,7 @@ module.exports = {
         }
 
         if (sourceWallet.balance < amount) {
-          return res.badRequest({ message: 'Insufficient balance' });
+          return res.badRequest({ message: 'Insufficient balance', messageCode: 'insufficient_funds' });
         }
 
         const updatedSourceWallet = await Wallet.updateOne({ id: sourceWalletId }).set({ balance: sourceWallet.balance - amount });
@@ -283,6 +283,38 @@ module.exports = {
       });
     }
   },
+  deleteByCategory: async function (req, res) {
+    try {
+      const { id:categoryId } = req.params;
+
+      if (!categoryId) {
+        return res.badRequest({ message: 'Category id not provided' });
+      }
+
+      const category = await Category.findOne({ id: categoryId });
+      if (!category) {
+        return res.badRequest({ message: 'Category not found' });
+      }
+
+      const transactions = await Transaction.find({ category: categoryId });
+      if (!transactions) {
+        return res.badRequest({ message: 'Transactions not found' });
+      }
+
+      const transactionsDeleted = await Transaction.destroy({ category: categoryId }).fetch();
+      if (!transactionsDeleted) {
+        return res.badRequest({ message: 'Failed to delete transactions' });
+      }
+
+      return res.ok({ transactions: transactionsDeleted });
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        messageCode: 'server_error',
+        error,
+      });
+    }
+  }
 
 };
 
