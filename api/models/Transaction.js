@@ -52,6 +52,14 @@ module.exports = {
       model: 'wallet',
       required: false,
     },
+    sourceWallet: {
+      model: 'wallet',
+      required: false,
+    },
+    targetWallet: {
+      model: 'wallet',
+      required: false,
+    },
     user: {
       model: 'user',
       required: true,

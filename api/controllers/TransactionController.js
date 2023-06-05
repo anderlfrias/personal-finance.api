@@ -11,11 +11,59 @@ module.exports = {
     try {
       const { amount, type, description, date, evidence, category, wallet, budget, user } = req.body;
 
-      if (type === 'transfer') {
-        const { sourceWallet, destinationWallet } = req.body;
+      if (!type) {
+        return res.badRequest({ message: 'Type not provided', messageCode: 'type_not_provided' });
       }
 
-      if (!user || !amount || !type ) {
+      if (type === 'transfer') {
+        const { sourceWallet:sourceWalletId, targetWallet:targetWalletId } = req.body;
+        if (!sourceWalletId || !targetWalletId || !user || !amount || !date ) {
+          return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
+        }
+
+        const sourceWallet = await Wallet.findOne({ id: sourceWalletId });
+        const targetWallet = await Wallet.findOne({ id: targetWalletId });
+
+        if (!sourceWallet || !targetWallet) {
+          return res.badRequest({ message: 'Wallet not found' });
+        }
+
+        if (sourceWallet.balance < amount) {
+          return res.badRequest({ message: 'Insufficient balance' });
+        }
+
+        const updatedSourceWallet = await Wallet.updateOne({ id: sourceWalletId }).set({ balance: sourceWallet.balance - amount });
+        if (!updatedSourceWallet) {
+          return res.badRequest({ message: 'Failed to update source wallet balance' });
+        }
+
+        const updatedTargetWallet = await Wallet.updateOne({ id: targetWalletId }).set({ balance: targetWallet.balance + amount });
+        if (!updatedTargetWallet) {
+          return res.badRequest({ message: 'Failed to update target wallet balance' });
+        }
+
+        const transaction = await Transaction.create({
+          amount,
+          type,
+          date,
+          description,
+          evidence,
+          sourceWallet: sourceWalletId,
+          targetWallet: targetWalletId,
+          category: null,
+          wallet: null,
+          budget: null,
+          user
+        }).fetch();
+
+        if (!transaction) {
+          return res.badRequest({ message: 'Failed to create transaction' });
+        }
+
+        return res.ok({ transaction });
+      }
+
+      if (!user || !amount || !date || !wallet ) {
         return res.badRequest({ message: 'Missing fields', messageCode: 'missing_fields' });
       }
 
@@ -60,7 +108,7 @@ module.exports = {
         return res.badRequest({ message: 'Failed to create transaction' });
       }
 
-      return res.ok({transaction});
+      return res.ok({S});
     } catch (error) {
       return res.serverError({
         message: 'Server error',
