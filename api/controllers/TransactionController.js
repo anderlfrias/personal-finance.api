@@ -101,6 +101,8 @@ module.exports = {
         wallet,
         category: category || null,
         budget: budget || null,
+        targetWallet: null,
+        sourceWallet: null,
         user
       }).fetch();
 
@@ -108,7 +110,7 @@ module.exports = {
         return res.badRequest({ message: 'Failed to create transaction' });
       }
 
-      return res.ok({S});
+      return res.ok({transaction});
     } catch (error) {
       return res.serverError({
         message: 'Server error',
@@ -264,7 +266,9 @@ module.exports = {
       const transaction = await Transaction.findOne({ id })
         .populate('category')
         .populate('wallet')
-        .populate('budget');
+        .populate('budget')
+        .populate('targetWallet')
+        .populate('sourceWallet');
 
       if (!transaction) {
         return res.badRequest({ message: 'Transaction not found' });
