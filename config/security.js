@@ -30,7 +30,7 @@ module.exports.security = {
 
   cors: {
     allRoutes: true,
-    allowOrigins: ['http://localhost:3000', 'http://172.20.1.63:3000', 'http://192.168.0.132:3000', 'http://129.146.240.127:3000'],
+    allowOrigins: ['http://localhost:3000', 'http://172.20.1.63:3000', 'http://192.168.0.132:3000', 'http://129.146.240.127:3000', 'https://wallet-adm.anderlfrias.com'],
     allowCredentials: false,
     allowRequestMethods: 'GET, POST, PUT, DELETE',
     allowRequestHeaders: 'Content-Type, Authorization',
