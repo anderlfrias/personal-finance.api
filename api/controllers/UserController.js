@@ -307,7 +307,6 @@ module.exports = {
         username: user.username,
         role: user.role,
         isActive: user.isActive,
-        profilePic: user.profilePic,
       };
 
       const jwt = sign(data, secret);
@@ -322,6 +321,17 @@ module.exports = {
       return res.ok({
         message: 'User authenticated',
         token: jwt,
+        user: {
+          id: user.id,
+          name: user.name,
+          firstSurname: user.firstSurname,
+          secondSurname: user.secondSurname,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          isActive: user.isActive,
+          profilePic: user.profilePic,
+        }
       });
 
     } catch (err) {
