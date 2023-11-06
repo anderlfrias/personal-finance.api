@@ -283,6 +283,32 @@ module.exports = {
       });
     }
   },
+  getByWalletId: async function (req, res) {
+    try {
+      const { id:walletId } = req.params;
+
+      if (!walletId) {
+        return res.badRequest({ message: 'Wallet id not provided' });
+      }
+
+      const transactions = await Transaction.find()
+        .where({ wallet: walletId })
+        .sort('date DESC')
+        .select(['id', 'amount', 'type', 'date', 'description', 'category', 'wallet']);
+
+      if (!transactions) {
+        return res.badRequest({ message: 'Failed to get transactions' });
+      }
+
+      return res.ok({ transactions });
+    } catch (error) {
+      return res.serverError({
+        message: 'Server error',
+        messageCode: 'server_error',
+        error,
+      });
+    }
+  },
   deleteByCategory: async function (req, res) {
     try {
       const { id:categoryId } = req.params;
