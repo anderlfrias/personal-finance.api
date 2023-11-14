@@ -95,7 +95,8 @@ module.exports = {
           user: user.id,
           name: { contains: q },
         },
-      }).meta({ makeLikeModifierCaseInsensitive: true });
+      }).meta({ makeLikeModifierCaseInsensitive: true })
+        .sort('name ASC');
       res.ok( categories );
     } catch (error) {
       return res.serverError({
