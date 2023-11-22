@@ -78,6 +78,7 @@ module.exports.routes = {
   'GET /api/v1/transaction': 'TransactionController.get',
   'GET /api/v1/transaction/:id': 'TransactionController.getById',
   'GET /api/v1/transaction/wallet/:id': 'TransactionController.getByWalletId',
+  'GET /api/v1/transaction/category/:id': 'TransactionController.getByCategoryId',
   'POST /api/v1/transaction': 'TransactionController.create',
   'PUT /api/v1/transaction/:id': 'TransactionController.update',
   'DELETE /api/v1/transaction/:id': 'TransactionController.delete',
