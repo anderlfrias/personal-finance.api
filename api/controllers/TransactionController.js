@@ -221,14 +221,20 @@ module.exports = {
       const where = {
         user: id,
         category : { in : categories.split(',')},
-        wallet: { in: wallets.split(',')},
+        or: [
+          {wallet: { in: wallets.split(',')}},
+          {sourceWallet: { in: wallets.split(',')}},
+          {targetWallet: { in: wallets.split(',')}},
+        ],
         date: dateRange,
         description : { contains: q || '', },
       };
 
       !where.date && delete where.date;
       !where.category.in[0] && delete where.category;
-      !where.wallet.in[0] && delete where.wallet;
+      !where.or[0].wallet.in[0] && delete where.or[0].wallet;
+      !where.or[1].sourceWallet.in[0] && delete where.or[1].sourceWallet;
+      !where.or[2].targetWallet.in[0] && delete where.or[2].targetWallet;
 
       const total = await Transaction.count()
         .where(where)
