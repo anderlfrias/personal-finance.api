@@ -15,7 +15,7 @@ module.exports.email = {
     secure: false,
     auth: {
       user: 'anderson.frias@cmsiglo21.com',
-      pass: 'cmsiglo21@031601'
+      pass: '3mail@cmsiglo21'
     },
     tls: {
       rejectUnauthorized: false
