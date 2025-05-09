@@ -245,7 +245,7 @@ module.exports = {
         .meta({ makeLikeModifierCaseInsensitive: true })
         .populate('category')
         .populate('wallet')
-        .sort('date DESC')
+        .sort([{ date: 'DESC' }, { createdAt: 'DESC' }, { updatedAt: 'DESC' }])
         .select(['id', 'amount', 'type', 'date', 'description', 'category', 'wallet'])
         .limit(top)
         .skip(skip);
